@@ -10,6 +10,78 @@ export class MyMCP extends McpAgent {
 	});
 
 	async init() {
+		this.server.registerTool('get_client_capabilities', {
+			title: "Get client capabilities",
+			description: "Get the client capabilities",
+		}, async () => {
+			const capabilities = this.server.server.getClientCapabilities()
+			if (!capabilities) {
+				return { content: [{ type: "text", text: 'No capabilities' }] }
+			}
+			return { content: [{ type: "text", text: JSON.stringify(capabilities, null, 2) }] }
+		})
+
+		this.server.registerTool('ask_for_poem', {
+			title: "Ask for poem",
+			description: "Ask for a poem",
+		}, async () => {
+			const capabilities = this.server.server.getClientCapabilities()
+			if (!capabilities?.sampling) {
+				return { content: [{ type: "text", text: "You do not support sampling" }] }
+			}
+
+			console.log('Starting sampling')
+
+			const result = await this.server.server.createMessage({
+				systemPrompt: `You are good at poetry and really like dogs`,
+				messages: [
+					{
+						role: 'user',
+						content: {
+							type: 'text',
+							text: 'Please write me a poem',
+						},
+					},
+				],
+				maxTokens: 100,
+			})
+
+			return { content: [result.content] }
+		})
+
+		this.server.registerTool('elicit_feedback', {
+			title: "Elicit feedback",
+			description: "Elicit feedback from the user",
+		}, async () => {
+
+			const capabilities = this.server.server.getClientCapabilities()
+			if (!capabilities?.elicitation) {
+				return { content: [{ type: "text", text: "You do not support elicitation" }] }
+			}
+
+			console.log('Starting elicitation')
+
+			const result = await this.server.server.elicitInput({
+				message: 'Do you like cheese?',
+				requestedSchema: {
+					type: 'object',
+					properties: {
+						like_cheese: {
+							type: 'boolean',
+							description: 'Whether you like cheese',
+						},
+					},
+				},
+			})
+
+			if (result.action !== 'accept') {
+				return {
+					content: [{ type: "text", text: "You didn't respond" }]
+				}
+			}
+
+			return { content: [{ type: "text", text: result.content?.like_cheese ? "You like cheese" : 'You do not like cheese' }] }
+		})
 		// Simple addition tool
 		this.server.tool("add", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
 			content: [{ type: "text", text: String(a + b) }],
