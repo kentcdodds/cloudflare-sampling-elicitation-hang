@@ -1,5 +1,7 @@
 # Elicit Feedback and Sampling Hang
 
+https://www.loom.com/share/11025fc71ea240b5a0236de984467977
+
 CloudFlare's agents MCP utility does not currently support elicitation and sampling. As this example demonstrates, go ahead and try to run this with the inspector and you'll notice that for sampling and elicitation, the requests hang indefinitely. 
 
 ```
