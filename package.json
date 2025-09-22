@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "1.17.3",
-		"agents": "^0.0.113",
+		"agents": "https://pkg.pr.new/cloudflare/agents@485",
 		"zod": "^3.25.67"
 	},
 	"devDependencies": {
